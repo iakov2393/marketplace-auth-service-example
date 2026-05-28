@@ -39,6 +39,7 @@ class SQLAlchemyUserRepository(UserRepository):
         await self._session.flush()
         return True
 
+
 def _to_entity(model: UserModel) -> User:
     return User(
         id=model.id,
