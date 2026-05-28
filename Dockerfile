@@ -12,16 +12,20 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && addgroup --system --gid 1000 appuser \
+    && adduser --system --uid 1000 --ingroup appuser appuser
 
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project --no-dev
 
-COPY . .
+COPY --chown=appuser:appuser . .
 
 RUN uv sync --frozen --no-dev
+
+USER appuser
 
 EXPOSE 8000
 
