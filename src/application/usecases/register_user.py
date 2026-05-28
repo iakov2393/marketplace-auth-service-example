@@ -1,5 +1,5 @@
-import bcrypt
 import anyio
+import bcrypt
 
 from src.application.exceptions import EmailAlreadyTakenError
 from src.application.ports.uow import UnitOfWork

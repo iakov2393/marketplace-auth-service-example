@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
-import jwt
+
 import anyio
+import jwt
 
 from src.application.exceptions import InvalidCredentialsError
 from src.application.ports.uow import UnitOfWork
