@@ -2,10 +2,6 @@ FROM python:3.13-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    UV_LINK_MODE=copy \
-    UV_COMPILE_BYTECODE=1 \
-    UV_NO_DEV=1 \
-    UV_FROZEN=1 \
     PYTHONPATH=/app \
     PATH="/root/.local/bin:$PATH"
 
@@ -19,11 +15,10 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-install-project --no-dev
-
-COPY --chown=appuser:appuser . .
 
 RUN uv sync --frozen --no-dev
+
+COPY --chown=appuser:appuser . .
 
 USER appuser
 
