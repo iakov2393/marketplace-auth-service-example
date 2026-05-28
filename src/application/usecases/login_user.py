@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
 import anyio
+import bcrypt
 import jwt
 
 from src.application.exceptions import InvalidCredentialsError

@@ -26,5 +26,4 @@ class RegisterUser(RegisterUserPort):
                 password=hashed,
             )
 
-            await self._uow.commit()
             return user.id
