@@ -1,7 +1,6 @@
 from datetime import UTC, datetime, timedelta
-
-import bcrypt
 import jwt
+import anyio
 
 from src.application.exceptions import InvalidCredentialsError
 from src.application.ports.uow import UnitOfWork
@@ -31,7 +30,11 @@ class LoginUser(LoginUserPort):
             if user is None:
                 raise InvalidCredentialsError
 
-            if not bcrypt.checkpw(password.encode(), user.password.encode()):
+            is_valid = await anyio.to_thread.run_sync(
+                lambda: bcrypt.checkpw(password.encode(), user.password.encode())
+            )
+
+            if not is_valid:
                 raise InvalidCredentialsError
 
         now = datetime.now(UTC)
@@ -42,6 +45,7 @@ class LoginUser(LoginUserPort):
             "type": "access",
             "exp": now + timedelta(hours=self._jwt_expire_hours),
         }
+
         refresh_payload: RefreshTokenPayload = {
             "user_id": user.id,
             "type": "refresh",

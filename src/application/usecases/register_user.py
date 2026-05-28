@@ -1,4 +1,5 @@
 import bcrypt
+import anyio
 
 from src.application.exceptions import EmailAlreadyTakenError
 from src.application.ports.uow import UnitOfWork
@@ -15,7 +16,15 @@ class RegisterUser(RegisterUserPort):
             if existing is not None:
                 raise EmailAlreadyTakenError
 
-            hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-            user = await self._uow.users.create(name=name, email=email, password=hashed)
+            hashed = await anyio.to_thread.run_sync(
+                lambda: bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+            )
+
+            user = await self._uow.users.create(
+                name=name,
+                email=email,
+                password=hashed,
+            )
+
             await self._uow.commit()
             return user.id
