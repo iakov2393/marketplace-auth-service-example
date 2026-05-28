@@ -2,8 +2,12 @@ FROM python:3.13-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/root/.local/bin:$PATH" \
-    PYTHONPATH=/app
+    UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_NO_DEV=1 \
+    UV_FROZEN=1 \
+    PYTHONPATH=/app \
+    PATH="/root/.local/bin:$PATH"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates \
@@ -15,13 +19,14 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
-
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-install-project --no-dev
 
 COPY --chown=appuser:appuser . .
+
+RUN uv sync --frozen --no-dev
 
 USER appuser
 
 EXPOSE 8000
 
-CMD ["python", "-m", "bin.api"]
+CMD ["uv", "run", "python", "-m", "bin.api"]
