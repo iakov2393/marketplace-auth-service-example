@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_NO_DEV=1 \
     UV_FROZEN=1 \
     PYTHONPATH=/app \
-    PATH="/root/.local/bin:$PATH"
+    PATH="/app/.venv/bin:/root/.local/bin:$PATH"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates \
@@ -23,7 +23,8 @@ RUN uv sync --frozen --no-install-project --no-dev
 
 COPY --chown=appuser:appuser . .
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev \
+    && chown -R appuser:appuser /app
 
 USER appuser
 
