@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    database_url: str = ""
+    postgres_connection_string: str = ""
     jwt_secret: str = ""
     jwt_algorithm: str = "HS256"
     jwt_expire_hours: int = 24
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     @property
     def async_database_url(self) -> str:
-        url = self.database_url
+        url = self.postgres_connection_string
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         if url.startswith("postgresql://"):
